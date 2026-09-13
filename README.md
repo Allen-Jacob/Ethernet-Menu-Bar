@@ -19,19 +19,31 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 
 ## Installation
 
-1. Construis l’application avec la commande ci-dessous.
-2. Glisse `dist/Ethernet Menu Bar.app` dans le dossier `/Applications`.
-3. Ouvre l’application.
-4. Clique sur son icône, puis sur **Réglages…** pour la personnaliser.
+### Installation automatique
+
+Le script construit, signe, copie l’app dans `/Applications`, la lance et confirme que son processus fonctionne :
 
 ```sh
-./scripts/build-app.sh
-open "dist/Ethernet Menu Bar.app"
+./scripts/install-app.sh
 ```
 
-Le script crée une version optimisée dans `dist/Ethernet Menu Bar.app`. Il utilise automatiquement la première identité de signature Apple disponible dans le trousseau, avec une signature ad hoc comme solution de repli.
+### Image disque
+
+Pour créer un installateur visuel standard avec un raccourci vers Applications :
+
+```sh
+./scripts/create-dmg.sh
+```
+
+Ouvre ensuite le `.dmg` produit dans `dist`, puis glisse **Ethernet Menu Bar** sur **Applications**.
+
+Le script de construction utilise automatiquement la première identité de signature Apple disponible dans le trousseau, avec une signature ad hoc comme solution de repli.
 
 > Pour que « Ouvrir automatiquement à la connexion » fonctionne correctement, place d’abord l’application dans le dossier Applications.
+
+### Si Ice masque l’icône
+
+Ice place parfois les nouveaux éléments tout à gauche, dans sa section « Toujours masquée ». Ethernet Menu Bar enregistre maintenant une position persistante. Si nécessaire, ouvre **Ice → Disposition** et déplace l’indicateur `2.5G` dans **Visible**.
 
 ## Développement
 

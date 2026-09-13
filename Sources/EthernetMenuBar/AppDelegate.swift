@@ -40,17 +40,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let speedLabel = connection?.speedLabel ?? "—"
         item.button?.image = StatusIcon.make(
             style: settings.iconStyle,
-            speedLabel: speedLabel,
-            showsSpeed: settings.showsSpeed,
             isConnected: connection != nil
         )
+        item.button?.title = settings.showsSpeed ? " \(speedLabel)" : ""
+        item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
+        item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly
         item.button?.toolTip = connection.map { "Ethernet \($0.speedLabel) — \($0.interfaceName)" } ?? "Ethernet déconnecté — mode test"
         rebuildMenu(for: item, connection: connection)
     }
 
     private func makeStatusItem() -> NSStatusItem {
-        let item = NSStatusBar.system.statusItem(withLength: 30)
-        item.button?.imagePosition = .imageOnly
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem = item
         return item
     }
