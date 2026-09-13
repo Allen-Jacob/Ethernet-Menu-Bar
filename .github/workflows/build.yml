@@ -16,7 +16,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Test
         run: swift test
@@ -34,7 +34,7 @@ jobs:
             "dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.zip"
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Ethernet-Menu-Bar-${{ steps.version.outputs.value }}
           path: |
