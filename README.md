@@ -16,6 +16,8 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 - Lancement automatique à l’ouverture de session
 - Aucun élément dans le Dock
 - Réglages sauvegardés automatiquement
+- Assistant de premier lancement pour l’installation et l’ouverture automatique
+- Compilation et publication automatiques avec GitHub Actions
 
 ## Installation
 
@@ -62,6 +64,10 @@ swift test
 ```
 
 Les tests couvrent la détection de l’état actif et l’interprétation des vitesses annoncées par l’interface réseau.
+
+## Intégration continue
+
+La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.2.0` crée également une Release GitHub avec les deux formats téléchargeables.
 
 ## Confidentialité
 

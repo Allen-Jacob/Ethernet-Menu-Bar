@@ -32,6 +32,7 @@ final class SettingsStore: ObservableObject {
         static let showsSpeed = "showsSpeed"
         static let refreshInterval = "refreshInterval"
         static let keepVisible = "keepVisible"
+        static let onboardingCompleted = "onboardingCompleted"
     }
 
     private let defaults: UserDefaults
@@ -51,6 +52,8 @@ final class SettingsStore: ObservableObject {
     }
     @Published private(set) var launchAtLogin: Bool
     @Published var launchAtLoginError: String?
+
+    var onboardingCompleted: Bool { defaults.bool(forKey: Key.onboardingCompleted) }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -74,5 +77,9 @@ final class SettingsStore: ObservableObject {
             launchAtLogin = SMAppService.mainApp.status == .enabled
             launchAtLoginError = "Impossible de modifier le démarrage automatique. Place d’abord l’app dans Applications."
         }
+    }
+
+    func completeOnboarding() {
+        defaults.set(true, forKey: Key.onboardingCompleted)
     }
 }

@@ -1,0 +1,53 @@
+name: Build macOS app
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test
+        run: swift test
+
+      - name: Read version
+        id: version
+        run: echo "value=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' App/Info.plist)" >> "$GITHUB_OUTPUT"
+
+      - name: Build app and disk image
+        run: |
+          chmod +x scripts/*.sh
+          ./scripts/create-dmg.sh
+          ditto -c -k --sequesterRsrc --keepParent \
+            "dist/Ethernet Menu Bar.app" \
+            "dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.zip"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ethernet-Menu-Bar-${{ steps.version.outputs.value }}
+          path: |
+            dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.dmg
+            dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.zip
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.dmg" \
+            "dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.zip" \
+            --title "Ethernet Menu Bar ${{ steps.version.outputs.value }}" \
+            --generate-notes

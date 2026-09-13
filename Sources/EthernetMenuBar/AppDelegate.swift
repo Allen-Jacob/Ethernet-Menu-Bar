@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var timer: Timer?
     private var settingsWindow: NSWindowController?
+    private var onboardingWindow: NSWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         settings.onChange = { [weak self] in
@@ -16,6 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         refresh()
         scheduleTimer()
+        presentOnboardingIfNeeded()
     }
 
     private func scheduleTimer() {
@@ -89,6 +91,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             settingsWindow = NSWindowController(window: window)
         }
         settingsWindow?.showWindow(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func presentOnboardingIfNeeded() {
+        let isInstalled = Bundle.main.bundleURL.path.hasPrefix("/Applications/")
+        guard !settings.onboardingCompleted || !isInstalled else { return }
+
+        let view = OnboardingView(settings: settings, isInstalled: isInstalled) { [weak self] in
+            self?.settings.completeOnboarding()
+            self?.onboardingWindow?.close()
+        }
+        let window = NSWindow(contentViewController: NSHostingController(rootView: view))
+        window.title = "Bienvenue — Ethernet Menu Bar"
+        window.styleMask = [.titled, .closable]
+        window.isReleasedWhenClosed = false
+        window.center()
+        onboardingWindow = NSWindowController(window: window)
+        onboardingWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 }
