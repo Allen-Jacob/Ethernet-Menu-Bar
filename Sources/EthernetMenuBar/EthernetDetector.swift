@@ -28,13 +28,18 @@ struct CommandRunner {
 
 struct EthernetDetector {
     private let runner: CommandRunner
+    private let interfaceNames: () -> [String]
 
-    init(runner: CommandRunner = CommandRunner()) {
+    init(
+        runner: CommandRunner = CommandRunner(),
+        interfaceNames: @escaping () -> [String] = EthernetDetector.ethernetInterfaceNames
+    ) {
         self.runner = runner
+        self.interfaceNames = interfaceNames
     }
 
     func activeConnection() -> EthernetConnection? {
-        for interface in Self.ethernetInterfaceNames() {
+        for interface in interfaceNames() {
             guard let details = runner.run("/sbin/ifconfig", [interface]),
                   Self.isActive(ifconfigOutput: details) else { continue }
 
@@ -47,14 +52,14 @@ struct EthernetDetector {
     }
 
     static func ethernetInterfaceNames() -> [String] {
-        guard let interfaces = SCNetworkInterfaceCopyAll() as? [SCNetworkInterface] else {
-            return []
-        }
-        return interfaces.compactMap { interface in
+        let interfaces = SCNetworkInterfaceCopyAll() as NSArray
+        var names: [String] = []
+        for case let interface as SCNetworkInterface in interfaces {
             guard SCNetworkInterfaceGetInterfaceType(interface) == kSCNetworkInterfaceTypeEthernet,
-                  let name = SCNetworkInterfaceGetBSDName(interface) else { return nil }
-            return name as String
+                  let name = SCNetworkInterfaceGetBSDName(interface) else { continue }
+            names.append(name as String)
         }
+        return names
     }
 
     static func isActive(ifconfigOutput: String) -> Bool {

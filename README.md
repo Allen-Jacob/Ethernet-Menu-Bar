@@ -29,7 +29,7 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 open "dist/Ethernet Menu Bar.app"
 ```
 
-Le script crée une version optimisée et signée localement dans `dist/Ethernet Menu Bar.app`.
+Le script crée une version optimisée dans `dist/Ethernet Menu Bar.app`. Il utilise automatiquement la première identité de signature Apple disponible dans le trousseau, avec une signature ad hoc comme solution de repli.
 
 > Pour que « Ouvrir automatiquement à la connexion » fonctionne correctement, place d’abord l’application dans le dossier Applications.
 
