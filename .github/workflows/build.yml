@@ -14,6 +14,8 @@ permissions:
 jobs:
   build:
     runs-on: macos-15
+    env:
+      HAS_SIGNING_CERTIFICATE: ${{ secrets.DEVELOPER_ID_APPLICATION_P12 != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -25,6 +27,26 @@ jobs:
         id: version
         run: echo "value=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' App/Info.plist)" >> "$GITHUB_OUTPUT"
 
+      - name: Import Developer ID certificate
+        if: env.HAS_SIGNING_CERTIFICATE == 'true'
+        env:
+          CERTIFICATE_P12: ${{ secrets.DEVELOPER_ID_APPLICATION_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APPLICATION_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.BUILD_KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/developer-id.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/ethernet-menu-bar.keychain-db"
+          echo "$CERTIFICATE_P12" | base64 --decode > "$CERTIFICATE_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" login.keychain-db
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -n 1)"
+          test -n "$IDENTITY"
+          echo "CODESIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
       - name: Build app and disk image
         run: |
           chmod +x scripts/*.sh
@@ -32,6 +54,24 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent \
             "dist/Ethernet Menu Bar.app" \
             "dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.zip"
+
+      - name: Sign and notarize disk image
+        if: env.HAS_SIGNING_CERTIFICATE == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          DMG="dist/Ethernet-Menu-Bar-${{ steps.version.outputs.value }}.dmg"
+          codesign --force --timestamp --sign "$CODESIGN_IDENTITY" "$DMG"
+          xcrun notarytool submit "$DMG" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          xcrun stapler staple "$DMG"
+          xcrun stapler validate "$DMG"
+          spctl --assess --type open --context context:primary-signature -v "$DMG"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v6

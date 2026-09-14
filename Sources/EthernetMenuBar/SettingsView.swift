@@ -2,6 +2,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var settings: SettingsStore
+    let checkForUpdates: () -> Void
+    let showAbout: () -> Void
+    let uninstall: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -53,10 +56,21 @@ struct SettingsView: View {
                 .padding(8)
             }
 
+            GroupBox("Mises à jour") {
+                HStack {
+                    Toggle("Rechercher automatiquement les nouvelles versions", isOn: $settings.checksForUpdates)
+                    Spacer()
+                    Button("Vérifier maintenant", action: checkForUpdates)
+                }
+                .padding(8)
+            }
+
             HStack {
-                Label("Les réglages sont enregistrés automatiquement.", systemImage: "checkmark.circle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Button("Site web") {
+                    NSWorkspace.shared.open(URL(string: "https://jacoballen.ca")!)
+                }
+                Button("À propos d’Ethernet Menu Bar", action: showAbout)
+                Button("Désinstaller…", role: .destructive, action: uninstall)
                 Spacer()
                 Button("Terminé") { NSApp.keyWindow?.close() }
                     .keyboardShortcut(.defaultAction)

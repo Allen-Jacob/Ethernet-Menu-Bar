@@ -33,6 +33,7 @@ final class SettingsStore: ObservableObject {
         static let refreshInterval = "refreshInterval"
         static let keepVisible = "keepVisible"
         static let onboardingCompleted = "onboardingCompleted"
+        static let checksForUpdates = "checksForUpdates"
     }
 
     private let defaults: UserDefaults
@@ -52,6 +53,9 @@ final class SettingsStore: ObservableObject {
     }
     @Published private(set) var launchAtLogin: Bool
     @Published var launchAtLoginError: String?
+    @Published var checksForUpdates: Bool {
+        didSet { defaults.set(checksForUpdates, forKey: Key.checksForUpdates) }
+    }
 
     var onboardingCompleted: Bool { defaults.bool(forKey: Key.onboardingCompleted) }
 
@@ -61,6 +65,7 @@ final class SettingsStore: ObservableObject {
         showsSpeed = defaults.object(forKey: Key.showsSpeed) as? Bool ?? true
         refreshInterval = defaults.object(forKey: Key.refreshInterval) as? Double ?? 2
         keepVisible = defaults.bool(forKey: Key.keepVisible)
+        checksForUpdates = defaults.object(forKey: Key.checksForUpdates) as? Bool ?? true
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
 

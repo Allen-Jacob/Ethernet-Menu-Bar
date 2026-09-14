@@ -5,6 +5,7 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let detector = EthernetDetector()
     private let settings = SettingsStore()
+    private lazy var updater = UpdateController(settings: settings)
     private var statusItem: NSStatusItem?
     private var timer: Timer?
     private var settingsWindow: NSWindowController?
@@ -18,6 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refresh()
         scheduleTimer()
         presentOnboardingIfNeeded()
+        updater.startAutomaticChecks()
     }
 
     private func scheduleTimer() {
@@ -31,14 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let connection = detector.activeConnection()
 
         guard connection != nil || settings.keepVisible else {
-            if let statusItem {
-                NSStatusBar.system.removeStatusItem(statusItem)
-                self.statusItem = nil
-            }
+            statusItem?.isVisible = false
             return
         }
 
         let item = statusItem ?? makeStatusItem()
+        item.isVisible = true
         let speedLabel = connection?.speedLabel ?? "—"
         item.button?.image = StatusIcon.make(
             style: settings.iconStyle,
@@ -75,6 +75,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settingsItem = NSMenuItem(title: "Réglages…", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+        let updateItem = NSMenuItem(title: "Rechercher les mises à jour…", action: #selector(checkForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
         let quit = NSMenuItem(title: "Quitter Ethernet Menu Bar", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quit.target = NSApp
         menu.addItem(quit)
@@ -83,7 +86,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func showSettings() {
         if settingsWindow == nil {
-            let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(settings: settings)))
+            let view = SettingsView(
+                settings: settings,
+                checkForUpdates: { [weak self] in self?.updater.checkForUpdates(interactive: true) },
+                showAbout: { [weak self] in self?.showAbout() },
+                uninstall: { [weak self] in self?.confirmUninstall() }
+            )
+            let window = NSWindow(contentViewController: NSHostingController(rootView: view))
             window.title = "Réglages — Ethernet Menu Bar"
             window.styleMask = [.titled, .closable, .miniaturizable]
             window.isReleasedWhenClosed = false
@@ -92,6 +101,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         settingsWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func checkForUpdates() {
+        updater.checkForUpdates(interactive: true)
+    }
+
+    private func showAbout() {
+        NSApp.orderFrontStandardAboutPanel(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func confirmUninstall() {
+        let alert = NSAlert()
+        alert.messageText = "Désinstaller Ethernet Menu Bar?"
+        alert.informativeText = "L’application sera déplacée dans la corbeille et ne démarrera plus avec ton Mac."
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Désinstaller")
+        alert.addButton(withTitle: "Annuler")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        settings.setLaunchAtLogin(false)
+        do {
+            try FileManager.default.trashItem(at: Bundle.main.bundleURL, resultingItemURL: nil)
+            NSApp.terminate(nil)
+        } catch {
+            let failure = NSAlert(error: error)
+            failure.messageText = "Impossible de désinstaller l’application"
+            failure.runModal()
+        }
     }
 
     private func presentOnboardingIfNeeded() {

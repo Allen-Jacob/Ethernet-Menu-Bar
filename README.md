@@ -18,6 +18,8 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 - Réglages sauvegardés automatiquement
 - Assistant de premier lancement pour l’installation et l’ouverture automatique
 - Compilation et publication automatiques avec GitHub Actions
+- Vérification automatique des nouvelles Releases GitHub
+- Désinstallation intégrée depuis les réglages
 
 ## Installation
 
@@ -37,9 +39,11 @@ Pour créer un installateur visuel standard avec un raccourci vers Applications 
 ./scripts/create-dmg.sh
 ```
 
-Ouvre ensuite le `.dmg` produit dans `dist`, puis glisse **Ethernet Menu Bar** sur **Applications**.
+Ouvre ensuite le `.dmg` produit dans `dist`, puis suis la flèche **Glisser vers Applications**.
 
 Le script de construction utilise automatiquement la première identité de signature Apple disponible dans le trousseau, avec une signature ad hoc comme solution de repli.
+
+Les Releases sont signées et notariées par Apple lorsque les secrets Developer ID sont configurés dans GitHub Actions. C’est ce qui supprime l’alerte Gatekeeper « Apple n’a pas pu vérifier… » pour les téléchargements.
 
 > Pour que « Ouvrir automatiquement à la connexion » fonctionne correctement, place d’abord l’application dans le dossier Applications.
 
@@ -67,11 +71,15 @@ Les tests couvrent la détection de l’état actif et l’interprétation des v
 
 ## Intégration continue
 
-La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.2.0` crée également une Release GitHub avec les deux formats téléchargeables.
+La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.3.0` crée également une Release GitHub avec les deux formats téléchargeables.
+
+L’application vérifie automatiquement la dernière Release publique GitHub au lancement, puis toutes les six heures. La commande **Rechercher les mises à jour…** permet aussi de lancer une vérification manuelle. Lorsqu’une version plus récente existe, l’app télécharge et ouvre son `.dmg` officiel.
+
+Pour activer la signature et la notarisation, ajoutez dans **Settings → Secrets and variables → Actions** les secrets `DEVELOPER_ID_APPLICATION_P12` (le `.p12` encodé en base64), `DEVELOPER_ID_APPLICATION_PASSWORD`, `BUILD_KEYCHAIN_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD` et `APPLE_TEAM_ID`. Sans ces secrets, l’Action produit une signature ad hoc et macOS peut encore afficher l’avertissement Gatekeeper.
 
 ## Confidentialité
 
-Ethernet Menu Bar fonctionne entièrement sur le Mac. Elle n’envoie aucune donnée, n’effectue aucun suivi et ne contacte aucun service externe.
+Ethernet Menu Bar analyse la connexion entièrement sur le Mac et n’effectue aucun suivi. Si la recherche de mises à jour est activée, elle contacte uniquement l’API publique de GitHub pour lire la dernière Release du projet.
 
 ## Licence
 
