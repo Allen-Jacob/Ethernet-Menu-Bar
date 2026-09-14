@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import EthernetMenuBar
 
 struct EthernetDetectorTests {
@@ -25,5 +26,26 @@ struct EthernetDetectorTests {
     @Test func recognizesOnlyActiveStatus() {
         #expect(EthernetDetector.isActive(ifconfigOutput: "\tstatus: active\n"))
         #expect(!EthernetDetector.isActive(ifconfigOutput: "\tstatus: inactive\n"))
+    }
+}
+
+struct NetworkTrafficMeterTests {
+    @Test func calculatesTransferRatesBetweenSamples() {
+        var samples = [
+            InterfaceCounters(receivedBytes: 1_000, sentBytes: 500),
+            InterfaceCounters(receivedBytes: 5_000, sentBytes: 2_500)
+        ]
+        var meter = NetworkTrafficMeter(readCounters: { _ in samples.removeFirst() })
+        let start = Date(timeIntervalSinceReferenceDate: 100)
+
+        #expect(meter.sample(interface: "en7", at: start) == .zero)
+        #expect(meter.sample(interface: "en7", at: start.addingTimeInterval(2)) == NetworkTraffic(
+            downloadBytesPerSecond: 2_000,
+            uploadBytesPerSecond: 1_000
+        ))
+    }
+
+    @Test func formatsTrafficAsRate() {
+        #expect(TrafficFormatter.string(bytesPerSecond: 1_500).hasSuffix("/s"))
     }
 }

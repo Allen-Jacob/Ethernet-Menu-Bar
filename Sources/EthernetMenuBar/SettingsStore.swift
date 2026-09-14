@@ -5,6 +5,7 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
     case network
     case cable
     case arrows
+    case windowsEthernet
 
     var id: String { rawValue }
 
@@ -13,6 +14,7 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
         case .network: "Réseau"
         case .cable: "Câble"
         case .arrows: "Transfert"
+        case .windowsEthernet: "Windows"
         }
     }
 
@@ -21,6 +23,9 @@ enum MenuBarIconStyle: String, CaseIterable, Identifiable {
         case .network: "network"
         case .cable: "cable.connector.horizontal"
         case .arrows: "arrow.left.arrow.right"
+        // Used as the preview in Settings. The actual menu bar icon is drawn in
+        // StatusIcon to reproduce the familiar Windows wired-network silhouette.
+        case .windowsEthernet: "desktopcomputer"
         }
     }
 }

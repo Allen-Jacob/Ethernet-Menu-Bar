@@ -9,8 +9,10 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 - Détection automatique des interfaces Ethernet avec l’API native de macOS
 - Apparition et disparition dynamique de l’icône
 - Vitesses prises en charge : 10 Mbit/s, 100 Mbit/s, 1, 2.5, 5 et 10 Gbit/s
-- Trois styles d’icône : réseau, câble et transfert
+- Quatre styles d’icône : réseau, câble, transfert et Ethernet Windows
 - Affichage de la vitesse activable ou désactivable
+- Débits réels de téléchargement et d’envoi visibles au clic sur l’icône
+- Raccourci direct vers les réglages réseau de macOS
 - Vérification de la connexion toutes les 1, 2 ou 5 secondes
 - Mode test pour conserver l’icône visible sans câble
 - Lancement automatique à l’ouverture de session

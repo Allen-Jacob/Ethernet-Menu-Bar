@@ -10,6 +10,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var timer: Timer?
     private var settingsWindow: NSWindowController?
     private var onboardingWindow: NSWindowController?
+    private var trafficMeter = NetworkTrafficMeter()
+    private var traffic = NetworkTraffic.zero
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         settings.onChange = { [weak self] in
@@ -46,6 +48,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let connection = detector.activeConnection()
         let item = statusItem ?? makeStatusItem()
 
+        if let connection {
+            traffic = trafficMeter.sample(interface: connection.interfaceName)
+        } else {
+            trafficMeter.reset()
+            traffic = .zero
+        }
+
         guard connection != nil || settings.keepVisible else {
             // Keep the exact same NSStatusItem registered so macOS and Ice retain
             // its ordering. A zero width makes it visually disappear without a
@@ -53,21 +62,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             item.button?.image = nil
             item.button?.title = ""
             item.button?.toolTip = nil
+            item.button?.imagePosition = .imageOnly
+            item.menu = nil
             item.length = 0
             return
         }
 
-        item.length = NSStatusItem.variableLength
         let speedLabel = connection?.speedLabel ?? "—"
         item.button?.image = StatusIcon.make(
             style: settings.iconStyle,
             isConnected: connection != nil
         )
-        item.button?.title = settings.showsSpeed ? " \(speedLabel)" : ""
+        item.button?.title = settings.showsSpeed ? speedLabel : ""
         item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
         item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly
+        item.button?.imageHugsTitle = true
         item.button?.toolTip = connection.map { "Ethernet \($0.speedLabel) — \($0.interfaceName)" } ?? "Ethernet déconnecté — mode test"
+        item.length = compactLength(for: item.button)
         rebuildMenu(for: item, connection: connection)
+    }
+
+    private func compactLength(for button: NSStatusBarButton?) -> CGFloat {
+        guard let button else { return NSStatusItem.variableLength }
+        return max(18, ceil(button.fittingSize.width) - 3)
     }
 
     private func makeStatusItem() -> NSStatusItem {
@@ -93,6 +110,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(interface)
         }
         menu.addItem(.separator())
+        let download = NSMenuItem(
+            title: "↓  Téléchargement    \(TrafficFormatter.string(bytesPerSecond: traffic.downloadBytesPerSecond))",
+            action: nil,
+            keyEquivalent: ""
+        )
+        download.image = NSImage(systemSymbolName: "arrow.down", accessibilityDescription: "Téléchargement")
+        download.isEnabled = false
+        menu.addItem(download)
+        let upload = NSMenuItem(
+            title: "↑  Envoi                     \(TrafficFormatter.string(bytesPerSecond: traffic.uploadBytesPerSecond))",
+            action: nil,
+            keyEquivalent: ""
+        )
+        upload.image = NSImage(systemSymbolName: "arrow.up", accessibilityDescription: "Envoi")
+        upload.isEnabled = false
+        menu.addItem(upload)
+        menu.addItem(.separator())
+        let networkSettingsItem = NSMenuItem(
+            title: "Ouvrir les réglages réseau…",
+            action: #selector(openNetworkSettings),
+            keyEquivalent: ""
+        )
+        networkSettingsItem.image = NSImage(systemSymbolName: "network", accessibilityDescription: "Réglages réseau")
+        networkSettingsItem.target = self
+        menu.addItem(networkSettingsItem)
         let settingsItem = NSMenuItem(title: "Réglages…", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
@@ -103,6 +145,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         quit.target = NSApp
         menu.addItem(quit)
         item.menu = menu
+    }
+
+    @objc private func openNetworkSettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.Network-Settings.extension") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     @objc private func showSettings() {
