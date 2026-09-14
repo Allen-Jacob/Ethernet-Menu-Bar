@@ -13,7 +13,13 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "EthernetMenuBar",
-            dependencies: [.product(name: "Sparkle", package: "Sparkle")]
+            dependencies: [.product(name: "Sparkle", package: "Sparkle")],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-Xlinker", "-rpath",
+                    "-Xlinker", "@executable_path/../Frameworks"
+                ])
+            ]
         ),
         .testTarget(name: "EthernetMenuBarTests", dependencies: ["EthernetMenuBar"])
     ]

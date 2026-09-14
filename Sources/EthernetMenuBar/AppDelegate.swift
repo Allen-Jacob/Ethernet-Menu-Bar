@@ -73,7 +73,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             style: settings.iconStyle,
             isConnected: connection != nil
         )
-        item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : .white
+        // Let macOS choose black or white for the current menu-bar appearance.
+        // A forced white tint becomes invisible on a light menu bar.
+        item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : nil
         item.button?.title = settings.showsSpeed ? speedLabel : ""
         item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
         item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly
