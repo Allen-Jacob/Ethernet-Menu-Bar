@@ -26,9 +26,13 @@ if [[ -z "$SIGN_IDENTITY" ]]; then
     SIGN_IDENTITY="$(security find-identity -v -p codesigning | sed -n 's/.*"\(.*\)"/\1/p' | head -n 1)"
 fi
 if [[ -n "$SIGN_IDENTITY" ]]; then
+    codesign --force --deep --options runtime --timestamp --sign "$SIGN_IDENTITY" \
+        "$CONTENTS_DIR/Frameworks/Sparkle.framework"
     codesign --force --deep --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP_DIR"
 else
     SIGN_IDENTITY="-"
+    codesign --force --deep --options runtime --timestamp=none --sign "$SIGN_IDENTITY" \
+        "$CONTENTS_DIR/Frameworks/Sparkle.framework"
     codesign --force --deep --options runtime --timestamp=none --sign "$SIGN_IDENTITY" "$APP_DIR"
 fi
 echo "Signed with: $SIGN_IDENTITY"
