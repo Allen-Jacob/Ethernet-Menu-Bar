@@ -86,7 +86,7 @@ Chaque Release publie toujours les mêmes noms de fichiers, sans numéro de vers
 https://github.com/Allen-Jacob/Ethernet-Menu-Bar/releases/latest/download/Ethernet-Menu-Bar.dmg
 ```
 
-L’application utilise Sparkle pour vérifier, télécharger, installer et relancer les nouvelles versions sans ouvrir de DMG. La commande **Rechercher les mises à jour…** lance une vérification manuelle. Les Releases publient aussi des deltas binaires : lorsque la version installée est prise en charge, seuls les changements sont téléchargés; Sparkle retombe automatiquement sur l’archive complète si un delta n’est pas disponible ou applicable.
+L’application utilise Sparkle pour vérifier, télécharger, installer et relancer les nouvelles versions sans ouvrir de DMG. La commande **Rechercher les mises à jour…** lance une vérification manuelle. Les Releases publient aussi des deltas binaires : lorsque la version installée est prise en charge, seuls les changements sont téléchargés; Sparkle retombe automatiquement sur l’archive complète si un delta n’est pas disponible ou applicable. Les notes générées à chaque publication sont partagées entre GitHub (et les clients comme Latest) et la fenêtre de mise à jour Sparkle.
 
 Pour activer la signature et la notarisation, ajoutez dans **Settings → Secrets and variables → Actions** les secrets `DEVELOPER_ID_APPLICATION_P12` (le `.p12` encodé en base64), `DEVELOPER_ID_APPLICATION_PASSWORD`, `BUILD_KEYCHAIN_PASSWORD`, `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID` et `SPARKLE_PRIVATE_KEY`. Ce dernier s’exporte avec `generate_keys --account ca.jacoballen.EthernetMenuBar -x private-key` et doit rester secret. Sans les secrets Apple, l’Action produit une signature ad hoc et macOS peut encore afficher l’avertissement Gatekeeper.
 

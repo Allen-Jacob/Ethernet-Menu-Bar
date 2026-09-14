@@ -89,6 +89,7 @@ jobs:
             dist/Ethernet-Menu-Bar.zip
             dist/updates/appcast.xml
             dist/updates/*.delta
+            dist/release-notes.md
 
       - name: Publish tagged release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -97,10 +98,12 @@ jobs:
         run: |
           shopt -s nullglob
           SPARKLE_ASSETS=(dist/updates/*.delta)
+          RELEASE_NOTES_ASSETS=(dist/updates/*.md)
           gh release create "$GITHUB_REF_NAME" \
             "dist/Ethernet-Menu-Bar.dmg" \
             "dist/Ethernet-Menu-Bar.zip" \
             "dist/updates/appcast.xml" \
             "${SPARKLE_ASSETS[@]}" \
+            "${RELEASE_NOTES_ASSETS[@]}" \
             --title "Ethernet Menu Bar ${{ steps.version.outputs.value }}" \
-            --generate-notes
+            --notes-file "dist/release-notes.md"

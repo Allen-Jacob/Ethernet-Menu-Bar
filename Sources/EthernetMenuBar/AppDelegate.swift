@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private let detector = EthernetDetector()
     private let settings = SettingsStore()
     private lazy var updater = UpdateController(settings: settings)
@@ -145,6 +145,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func showSettings() {
+        NSApp.setActivationPolicy(.regular)
         if settingsWindow == nil {
             let view = SettingsView(
                 settings: settings,
@@ -156,11 +157,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.title = "Réglages — Ethernet Menu Bar"
             window.styleMask = [.titled, .closable, .miniaturizable]
             window.isReleasedWhenClosed = false
+            window.delegate = self
             window.center()
             settingsWindow = NSWindowController(window: window)
         }
         settingsWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let hasVisibleWindow = self.settingsWindow?.window?.isVisible == true
+                || self.onboardingWindow?.window?.isVisible == true
+            if !hasVisibleWindow {
+                NSApp.setActivationPolicy(.accessory)
+            }
+        }
     }
 
     @objc private func checkForUpdates() {
@@ -205,8 +218,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.title = "Bienvenue — Ethernet Menu Bar"
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
+        window.delegate = self
         window.center()
         onboardingWindow = NSWindowController(window: window)
+        NSApp.setActivationPolicy(.regular)
         onboardingWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
         return true
