@@ -98,49 +98,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func rebuildMenu(for item: NSStatusItem, connection: EthernetConnection?) {
         let menu = NSMenu()
         let summary = NSMenuItem(
-            title: connection.map { "Ethernet connecté — \($0.speedLabel)" } ?? "Ethernet déconnecté",
+            title: connection == nil ? "Ethernet : Déconnecté" : "Ethernet : Connecté",
             action: nil,
             keyEquivalent: ""
         )
         summary.isEnabled = false
         menu.addItem(summary)
-        if let connection {
-            let interface = NSMenuItem(title: "Interface : \(connection.interfaceName)", action: nil, keyEquivalent: "")
-            interface.isEnabled = false
-            menu.addItem(interface)
-        }
-        menu.addItem(.separator())
-        let download = NSMenuItem(
-            title: "↓  Téléchargement    \(TrafficFormatter.string(bytesPerSecond: traffic.downloadBytesPerSecond))",
+
+        let speed = NSMenuItem(
+            title: "Débit : \(TrafficFormatter.string(bytesPerSecond: traffic.downloadBytesPerSecond)) ↓  |  \(TrafficFormatter.string(bytesPerSecond: traffic.uploadBytesPerSecond)) ↑",
             action: nil,
             keyEquivalent: ""
         )
-        download.image = NSImage(systemSymbolName: "arrow.down", accessibilityDescription: "Téléchargement")
-        download.isEnabled = false
-        menu.addItem(download)
-        let upload = NSMenuItem(
-            title: "↑  Envoi                     \(TrafficFormatter.string(bytesPerSecond: traffic.uploadBytesPerSecond))",
-            action: nil,
-            keyEquivalent: ""
-        )
-        upload.image = NSImage(systemSymbolName: "arrow.up", accessibilityDescription: "Envoi")
-        upload.isEnabled = false
-        menu.addItem(upload)
+        speed.isEnabled = false
+        menu.addItem(speed)
+
         menu.addItem(.separator())
         let networkSettingsItem = NSMenuItem(
             title: "Ouvrir les réglages réseau…",
             action: #selector(openNetworkSettings),
-            keyEquivalent: ""
+            keyEquivalent: "n"
         )
-        networkSettingsItem.image = NSImage(systemSymbolName: "network", accessibilityDescription: "Réglages réseau")
+        networkSettingsItem.keyEquivalentModifierMask = [.command]
         networkSettingsItem.target = self
         menu.addItem(networkSettingsItem)
+
         let settingsItem = NSMenuItem(title: "Réglages…", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
-        let updateItem = NSMenuItem(title: "Rechercher les mises à jour…", action: #selector(checkForUpdates), keyEquivalent: "")
-        updateItem.target = self
-        menu.addItem(updateItem)
+
+        menu.addItem(.separator())
         let quit = NSMenuItem(title: "Quitter Ethernet Menu Bar", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         quit.target = NSApp
         menu.addItem(quit)
