@@ -66,17 +66,20 @@ struct SettingsView: View {
             }
 
             HStack {
-                Button("Site web") {
-                    NSWorkspace.shared.open(URL(string: "https://jacoballen.ca")!)
+                Link(destination: URL(string: "https://jacoballen.ca")!) {
+                    Label("Site web", systemImage: "globe")
+                }
+                Link(destination: URL(string: "https://jacoballen.ca/projects")!) {
+                    Label("Page du projet", systemImage: "network")
                 }
                 Button("À propos d’Ethernet Menu Bar", action: showAbout)
-                Button("Désinstaller…", role: .destructive, action: uninstall)
                 Spacer()
+                Button("Désinstaller…", role: .destructive, action: uninstall)
                 Button("Terminé") { NSApp.keyWindow?.close() }
                     .keyboardShortcut(.defaultAction)
             }
         }
         .padding(22)
-        .frame(width: 500)
+        .frame(width: 640)
     }
 }

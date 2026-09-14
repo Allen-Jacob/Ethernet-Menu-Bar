@@ -18,8 +18,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         refresh()
         scheduleTimer()
-        presentOnboardingIfNeeded()
+        let presentedOnboarding = presentOnboardingIfNeeded()
         updater.startAutomaticChecks()
+
+        // With no Ethernet link the status item is intentionally invisible, so a
+        // direct launch from Spotlight/Finder must still expose the settings.
+        if !presentedOnboarding {
+            DispatchQueue.main.async { [weak self] in
+                self?.showSettings()
+            }
+        }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        showSettings()
+        return false
     }
 
     private func scheduleTimer() {
@@ -132,9 +145,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func presentOnboardingIfNeeded() {
+    @discardableResult
+    private func presentOnboardingIfNeeded() -> Bool {
         let isInstalled = Bundle.main.bundleURL.path.hasPrefix("/Applications/")
-        guard !settings.onboardingCompleted || !isInstalled else { return }
+        guard !settings.onboardingCompleted || !isInstalled else { return false }
 
         let view = OnboardingView(settings: settings, isInstalled: isInstalled) { [weak self] in
             self?.settings.completeOnboarding()
@@ -148,5 +162,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         onboardingWindow = NSWindowController(window: window)
         onboardingWindow?.showWindow(nil)
         NSApp.activate(ignoringOtherApps: true)
+        return true
     }
 }

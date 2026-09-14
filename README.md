@@ -20,6 +20,8 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 - Compilation et publication automatiques avec GitHub Actions
 - Vérification automatique des nouvelles Releases GitHub
 - Désinstallation intégrée depuis les réglages
+- Ouverture directe des réglages lorsqu’on relance l’app depuis Spotlight ou Finder
+- Liens vers [jacoballen.ca](https://jacoballen.ca) et la [page des projets](https://jacoballen.ca/projects)
 
 ## Installation
 
@@ -71,7 +73,7 @@ Les tests couvrent la détection de l’état actif et l’interprétation des v
 
 ## Intégration continue
 
-La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.3.0` crée également une Release GitHub avec les deux formats téléchargeables.
+La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.3.1` crée également une Release GitHub avec les deux formats téléchargeables.
 
 L’application vérifie automatiquement la dernière Release publique GitHub au lancement, puis toutes les six heures. La commande **Rechercher les mises à jour…** permet aussi de lancer une vérification manuelle. Lorsqu’une version plus récente existe, l’app télécharge et ouvre son `.dmg` officiel.
 
