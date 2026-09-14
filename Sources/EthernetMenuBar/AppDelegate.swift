@@ -17,11 +17,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         settings.onChange = { [weak self] in
             self?.scheduleTimer()
             self?.refresh()
+            self?.updater.applySettings()
         }
         refresh()
         scheduleTimer()
         let presentedOnboarding = presentOnboardingIfNeeded()
-        updater.startAutomaticChecks()
 
         // With no Ethernet link the status item is intentionally invisible, so a
         // direct launch from Spotlight/Finder must still expose the settings.
@@ -73,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             style: settings.iconStyle,
             isConnected: connection != nil
         )
-        item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : nil
+        item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : .white
         item.button?.title = settings.showsSpeed ? speedLabel : ""
         item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
         item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly

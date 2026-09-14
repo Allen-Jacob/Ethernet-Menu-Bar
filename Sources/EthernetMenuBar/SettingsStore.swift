@@ -59,7 +59,7 @@ final class SettingsStore: ObservableObject {
     @Published private(set) var launchAtLogin: Bool
     @Published var launchAtLoginError: String?
     @Published var checksForUpdates: Bool {
-        didSet { defaults.set(checksForUpdates, forKey: Key.checksForUpdates) }
+        didSet { defaults.set(checksForUpdates, forKey: Key.checksForUpdates); onChange?() }
     }
 
     var onboardingCompleted: Bool { defaults.bool(forKey: Key.onboardingCompleted) }

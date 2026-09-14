@@ -17,16 +17,26 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-	<string>0.4.0</string>
+	<string>0.4.1</string>
     <key>CFBundleVersion</key>
-	<string>10</string>
+	<string>11</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSHighResolutionCapable</key>
     <true/>
-    <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2026 Jacob Allen</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 Jacob Allen</string>
+	<key>SUFeedURL</key>
+	<string>https://github.com/Allen-Jacob/Ethernet-Menu-Bar/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>aGtIIgqtK65kqv+spf1+sEvpD1nsQ1rVssG8IOcv3Tk=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
 </dict>
 </plist>

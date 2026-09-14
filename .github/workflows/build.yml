@@ -55,6 +55,13 @@ jobs:
             "dist/Ethernet Menu Bar.app" \
             "dist/Ethernet-Menu-Bar.zip"
 
+      - name: Generate signed appcast and delta updates
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: ./scripts/create-appcast.sh
+
       - name: Sign and notarize disk image
         if: env.HAS_SIGNING_CERTIFICATE == 'true'
         env:
@@ -80,14 +87,20 @@ jobs:
           path: |
             dist/Ethernet-Menu-Bar.dmg
             dist/Ethernet-Menu-Bar.zip
+            dist/updates/appcast.xml
+            dist/updates/*.delta
 
       - name: Publish tagged release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          shopt -s nullglob
+          SPARKLE_ASSETS=(dist/updates/*.delta)
           gh release create "$GITHUB_REF_NAME" \
             "dist/Ethernet-Menu-Bar.dmg" \
             "dist/Ethernet-Menu-Bar.zip" \
+            "dist/updates/appcast.xml" \
+            "${SPARKLE_ASSETS[@]}" \
             --title "Ethernet Menu Bar ${{ steps.version.outputs.value }}" \
             --generate-notes

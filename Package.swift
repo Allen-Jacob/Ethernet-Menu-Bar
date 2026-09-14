@@ -7,8 +7,14 @@ let package = Package(
     products: [
         .executable(name: "EthernetMenuBar", targets: ["EthernetMenuBar"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.9.6")
+    ],
     targets: [
-        .executableTarget(name: "EthernetMenuBar"),
+        .executableTarget(
+            name: "EthernetMenuBar",
+            dependencies: [.product(name: "Sparkle", package: "Sparkle")]
+        ),
         .testTarget(name: "EthernetMenuBarTests", dependencies: ["EthernetMenuBar"])
     ]
 )
