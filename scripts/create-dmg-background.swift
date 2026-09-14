@@ -31,11 +31,11 @@ defer { NSGraphicsContext.restoreGraphicsState() }
 NSColor(calibratedWhite: 0.965, alpha: 1).setFill()
 NSBezierPath(rect: NSRect(origin: .zero, size: pixelSize)).fill()
 
-let heading = "Drag the app to Applications" as NSString
+let heading = "Glissez dans Applications, puis ouvrez l’app" as NSString
 let headingStyle = NSMutableParagraphStyle()
 headingStyle.alignment = .center
 let headingAttributes: [NSAttributedString.Key: Any] = [
-    .font: NSFont.systemFont(ofSize: 34, weight: .medium),
+    .font: NSFont.systemFont(ofSize: 28, weight: .medium),
     .foregroundColor: NSColor(calibratedWhite: 0.08, alpha: 1),
     .paragraphStyle: headingStyle
 ]

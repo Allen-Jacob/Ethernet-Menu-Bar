@@ -76,10 +76,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Let macOS choose black or white for the current menu-bar appearance.
         // A forced white tint becomes invisible on a light menu bar.
         item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : nil
-        item.button?.title = settings.showsSpeed ? speedLabel : ""
-        item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
+        // A thin space keeps the speed legible without making the status item
+        // noticeably wider. The lighter 9 pt label leaves the icon dominant.
+        item.button?.title = settings.showsSpeed ? "\u{2009}\(speedLabel)" : ""
+        item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 9, weight: .medium)
         item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly
-        item.button?.imageHugsTitle = true
+        item.button?.imageHugsTitle = false
         item.button?.toolTip = connection.map { "Ethernet \($0.speedLabel) — \($0.interfaceName)" } ?? "Ethernet déconnecté — affichage permanent"
         item.length = compactLength(for: item.button)
         rebuildMenu(for: item, connection: connection)
