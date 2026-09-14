@@ -44,14 +44,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func refresh() {
         let connection = detector.activeConnection()
+        let item = statusItem ?? makeStatusItem()
 
         guard connection != nil || settings.keepVisible else {
-            statusItem?.isVisible = false
+            // Keep the exact same NSStatusItem registered so macOS and Ice retain
+            // its ordering. A zero width makes it visually disappear without a
+            // hide/show cycle that would reinsert it at the end of the menu bar.
+            item.button?.image = nil
+            item.button?.title = ""
+            item.button?.toolTip = nil
+            item.length = 0
             return
         }
 
-        let item = statusItem ?? makeStatusItem()
-        item.isVisible = true
+        item.length = NSStatusItem.variableLength
         let speedLabel = connection?.speedLabel ?? "—"
         item.button?.image = StatusIcon.make(
             style: settings.iconStyle,
@@ -66,6 +72,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func makeStatusItem() -> NSStatusItem {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        item.autosaveName = "ca.jacoballen.EthernetMenuBar.statusItem"
+        item.isVisible = true
         statusItem = item
         return item
     }

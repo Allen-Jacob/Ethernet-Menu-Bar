@@ -22,6 +22,7 @@ L’icône apparaît lorsqu’un câble Ethernet est connecté et disparaît com
 - Désinstallation intégrée depuis les réglages
 - Ouverture directe des réglages lorsqu’on relance l’app depuis Spotlight ou Finder
 - Liens vers [jacoballen.ca](https://jacoballen.ca) et la [page des projets](https://jacoballen.ca/projects)
+- Position de l’indicateur conservée pendant les déconnexions, y compris avec Ice
 
 ## Installation
 
@@ -51,7 +52,7 @@ Les Releases sont signées et notariées par Apple lorsque les secrets Developer
 
 ### Si Ice masque l’icône
 
-Ice place parfois les nouveaux éléments tout à gauche, dans sa section « Toujours masquée ». Ethernet Menu Bar enregistre maintenant une position persistante. Si nécessaire, ouvre **Ice → Disposition** et déplace l’indicateur `2.5G` dans **Visible**.
+Ice place parfois les nouveaux éléments tout à gauche, dans sa section « Toujours masquée ». Ethernet Menu Bar utilise un identifiant de position macOS persistant et réduit le même élément à une largeur nulle pendant la déconnexion, au lieu de le retirer puis de le recréer. Après cette mise à jour, ouvre une seule fois **Ice → Disposition** et déplace l’indicateur `2.5G` dans **Visible**. Les déconnexions suivantes doivent conserver cette position.
 
 ## Développement
 
@@ -73,7 +74,7 @@ Les tests couvrent la détection de l’état actif et l’interprétation des v
 
 ## Intégration continue
 
-La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.3.2` crée également une Release GitHub avec les deux formats téléchargeables.
+La GitHub Action exécute les tests et construit automatiquement le `.app` et le `.dmg` à chaque push sur `main`. Les fichiers sont accessibles dans les artefacts du workflow. Un tag comme `v0.3.3` crée également une Release GitHub avec les deux formats téléchargeables.
 
 L’application vérifie automatiquement la dernière Release publique GitHub au lancement, puis toutes les six heures. La commande **Rechercher les mises à jour…** permet aussi de lancer une vérification manuelle. Lorsqu’une version plus récente existe, l’app télécharge et ouvre son `.dmg` officiel.
 
