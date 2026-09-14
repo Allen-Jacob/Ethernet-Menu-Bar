@@ -21,6 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 "$PROJECT_DIR/scripts/build-app.sh"
+swift "$PROJECT_DIR/scripts/create-dmg-background.swift" >/dev/null
 mkdir -p "$STAGING_DIR/source" "$BACKGROUND_DIR"
 ditto "$APP_PATH" "$STAGING_DIR/source/Ethernet Menu Bar.app"
 ln -s /Applications "$STAGING_DIR/source/Applications"
@@ -43,6 +44,8 @@ tell application "Finder"
         set current view of container window to icon view
         set toolbar visible of container window to false
         set statusbar visible of container window to false
+        set pathbar visible of container window to false
+        set sidebar width of container window to 0
         set bounds of container window to {120, 120, 780, 533}
         set viewOptions to the icon view options of container window
         set arrangement of viewOptions to not arranged
