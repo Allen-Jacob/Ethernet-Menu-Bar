@@ -4,7 +4,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 APP_PATH="$PROJECT_DIR/dist/Ethernet Menu Bar.app"
 VERSION="$(defaults read "$PROJECT_DIR/App/Info" CFBundleShortVersionString)"
-DMG_PATH="$PROJECT_DIR/dist/Ethernet-Menu-Bar-$VERSION.dmg"
+DMG_PATH="$PROJECT_DIR/dist/Ethernet-Menu-Bar.dmg"
 STAGING_DIR="$(mktemp -d)"
 RW_DMG="$STAGING_DIR/installer-rw.dmg"
 BACKGROUND_DIR="$STAGING_DIR/source/.background"

@@ -89,7 +89,7 @@ final class UpdateController {
         let response = alert.runModal()
 
         if response == .alertFirstButtonReturn,
-           let dmg = release.assets.first(where: { $0.name.lowercased().hasSuffix(".dmg") }) {
+           let dmg = release.assets.first(where: { $0.name == "Ethernet-Menu-Bar.dmg" }) {
             downloadAndOpen(dmg)
         } else if response == .alertThirdButtonReturn {
             NSWorkspace.shared.open(release.htmlURL)
