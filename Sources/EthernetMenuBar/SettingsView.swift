@@ -19,7 +19,12 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     Picker("Icône", selection: $settings.iconStyle) {
                         ForEach(MenuBarIconStyle.allCases) { style in
-                            Label(style.title, systemImage: style.symbolName).tag(style)
+                            Label {
+                                Text(style.title)
+                            } icon: {
+                                Image(nsImage: StatusIcon.make(style: style, isConnected: true) ?? NSImage())
+                            }
+                            .tag(style)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -37,7 +42,11 @@ struct SettingsView: View {
                         Text("Toutes les 5 secondes").tag(5.0)
                     }
 
-                    Toggle("Toujours afficher l’icône (mode test)", isOn: $settings.keepVisible)
+                    Picker("Toujours actif", selection: $settings.keepVisible) {
+                        Text("Oui").tag(true)
+                        Text("Non").tag(false)
+                    }
+                    .pickerStyle(.segmented)
 
                     Toggle(
                         "Ouvrir automatiquement à la connexion",

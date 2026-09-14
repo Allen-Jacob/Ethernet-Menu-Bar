@@ -18,10 +18,17 @@ enum StatusIcon {
     /// A compact monitor-and-plug glyph based on the wired-network indicator
     /// used by Windows. Drawing it locally keeps it sharp at menu-bar scale.
     private static func makeWindowsEthernetIcon(accessibilityDescription: String) -> NSImage {
-        let image = NSImage(size: NSSize(width: 17, height: 14), flipped: false) { _ in
+        let image = NSImage(size: NSSize(width: 19, height: 15), flipped: false) { _ in
             NSColor.black.setStroke()
 
-            let screen = NSBezierPath(roundedRect: NSRect(x: 0.75, y: 4.25, width: 9.5, height: 7.5), xRadius: 0.8, yRadius: 0.8)
+            // The reference Windows glyph has the RJ45 plug on the upper-left
+            // and the display on the right. Keep the geometry on half-pixels so
+            // the template remains crisp on both Retina and non-Retina screens.
+            let screen = NSBezierPath(
+                roundedRect: NSRect(x: 7.25, y: 4.25, width: 10.5, height: 8.5),
+                xRadius: 0.9,
+                yRadius: 0.9
+            )
             screen.lineWidth = 1.5
             screen.stroke()
 
@@ -30,20 +37,31 @@ enum StatusIcon {
             details.lineCapStyle = .round
             details.lineJoinStyle = .round
 
-            // Monitor stand, then the cable leading to an RJ45-like plug.
-            details.move(to: NSPoint(x: 5.5, y: 4.25))
-            details.line(to: NSPoint(x: 5.5, y: 2.25))
-            details.move(to: NSPoint(x: 3.25, y: 1.75))
-            details.line(to: NSPoint(x: 7.75, y: 1.75))
-            details.move(to: NSPoint(x: 10.25, y: 7.5))
-            details.line(to: NSPoint(x: 12.25, y: 7.5))
-            details.line(to: NSPoint(x: 12.25, y: 4.75))
-            details.line(to: NSPoint(x: 14.75, y: 4.75))
+            // Plug stem and short cable, followed by the monitor stand.
+            details.move(to: NSPoint(x: 3.75, y: 10.25))
+            details.line(to: NSPoint(x: 3.75, y: 2.25))
+            details.line(to: NSPoint(x: 7.25, y: 2.25))
+            details.move(to: NSPoint(x: 12.5, y: 4.25))
+            details.line(to: NSPoint(x: 12.5, y: 2.25))
+            details.move(to: NSPoint(x: 9.75, y: 1.75))
+            details.line(to: NSPoint(x: 15.25, y: 1.75))
             details.stroke()
 
-            let plug = NSBezierPath(roundedRect: NSRect(x: 13.25, y: 4, width: 3, height: 3), xRadius: 0.45, yRadius: 0.45)
+            let plug = NSBezierPath(
+                roundedRect: NSRect(x: 1.25, y: 10.25, width: 5, height: 4),
+                xRadius: 0.45,
+                yRadius: 0.45
+            )
             plug.lineWidth = 1.5
             plug.stroke()
+
+            let contacts = NSBezierPath()
+            contacts.lineWidth = 1.2
+            contacts.move(to: NSPoint(x: 2.75, y: 13.75))
+            contacts.line(to: NSPoint(x: 2.75, y: 12.25))
+            contacts.move(to: NSPoint(x: 4.75, y: 13.75))
+            contacts.line(to: NSPoint(x: 4.75, y: 12.25))
+            contacts.stroke()
             return true
         }
         image.isTemplate = true

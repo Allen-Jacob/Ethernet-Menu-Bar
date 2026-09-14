@@ -73,11 +73,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             style: settings.iconStyle,
             isConnected: connection != nil
         )
+        item.button?.contentTintColor = connection == nil ? .secondaryLabelColor : nil
         item.button?.title = settings.showsSpeed ? speedLabel : ""
         item.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
         item.button?.imagePosition = settings.showsSpeed ? .imageLeading : .imageOnly
         item.button?.imageHugsTitle = true
-        item.button?.toolTip = connection.map { "Ethernet \($0.speedLabel) — \($0.interfaceName)" } ?? "Ethernet déconnecté — mode test"
+        item.button?.toolTip = connection.map { "Ethernet \($0.speedLabel) — \($0.interfaceName)" } ?? "Ethernet déconnecté — affichage permanent"
         item.length = compactLength(for: item.button)
         rebuildMenu(for: item, connection: connection)
     }
